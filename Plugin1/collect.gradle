@@ -8,6 +8,19 @@ sourceSets {
         }
     }
 }
+
+android {
+    dexOptions {
+        javaMaxHeapSize "4g"
+        preDexLibraries = false
+
+        additionalParameters += '--multi-dex'
+        additionalParameters += '--main-dex-list=maindexlist.txt'
+        additionalParameters += '--minimal-main-dex'
+        additionalParameters += '--set-max-idx-number=20000'
+    }
+}
+
 task collectMainDexList {
     println sourceSets.asList()
     sourceSets.iterator().each {
@@ -29,8 +42,9 @@ def wEachClassWithInnerClassToFile(def directory, def fileName, def extension, d
                 String innerClass = reference.replace('.',"\$$i.")
                 out.println innerClass
             }
-
         }
     }
 }
+
+collectMainDexList.dependsOn(preBuild)
 

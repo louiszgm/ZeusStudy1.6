@@ -43,15 +43,6 @@ android {
 //        aaptOptions.additionalParameters '--PLUG-resoure-id', '0x71'
 //    }
 
-    dexOptions {
-        javaMaxHeapSize "4g"
-        preDexLibraries = false
-
-        additionalParameters += '--multi-dex'
-        additionalParameters += '--main-dex-list=maindexlist.txt'
-        additionalParameters += '--minimal-main-dex'
-        additionalParameters += '--set-max-idx-number=20000'
-    }
 }
 
 dependencies {
