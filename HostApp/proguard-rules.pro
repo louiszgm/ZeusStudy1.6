@@ -6,7 +6,7 @@
 -keepattributes Signature
 -keepattributes SourceFile,LineNumberTable
 
--applymapping mapping_mypluginlibrary.txt
+#-applymapping mapping_mypluginlibrary.txt
 
 -dontshrink
 
@@ -98,3 +98,5 @@
 #PullToRefreshLibrary下拉刷新框架不混淆
 -keep class com.handmark.pulltorefresh.library.** { *; }
 -dontwarn com.handmark.pulltorefresh.library.**
+
+-applymapping mapping_Plugin1.txt

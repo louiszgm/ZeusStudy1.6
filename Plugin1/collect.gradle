@@ -1,6 +1,6 @@
 group = "Plugin1"
 version = "1.0"
-
+def pluginMappingName = "mapping_$project.name" + ".txt"
 sourceSets {
     main {
         java {
@@ -25,13 +25,11 @@ android {
         if (variant.name == "release") {
             // checking for mapping file and copy to HostApp folder
             if (variant.mappingFile != null && variant.mappingFile.exists()) {
-                def pluginMappingName = "mapping-$project.name" + ".txt"
                 copy {
                     from variant.mappingFile.absolutePath
                     into "../HostApp"
                     rename 'mapping.txt', pluginMappingName
                 }
-//                new File("../HostApp/$pluginMappingName").append("\n-applymapping $pluginMappingName")
             }
             // rename release apk name and copy to HostApp's assets
             variant.outputs.each { output ->
@@ -98,4 +96,6 @@ def wEachClassWithInnerClassToFile(
 }
 configProguard.dependsOn(preBuild)
 collectMainDexList.dependsOn(preBuild)
-
+build.doLast{
+    file("../HostApp/proguard-rules.pro") << "\n-applymapping $pluginMappingName"
+}

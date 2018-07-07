@@ -35,13 +35,13 @@ android {
         abortOnError false
     }
 
-//    preBuild.doFirst {
-//        modifyAaptPathTask.execute()
-//    }
-//
-//    aaptOptions {
-//        aaptOptions.additionalParameters '--PLUG-resoure-id', '0x71'
-//    }
+    preBuild.doFirst {
+        modifyAaptPathTask.execute()
+    }
+
+    aaptOptions {
+        aaptOptions.additionalParameters '--PLUG-resoure-id', '0x71'
+    }
 
 
 
