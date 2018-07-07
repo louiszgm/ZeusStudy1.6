@@ -19,7 +19,25 @@ android {
         additionalParameters += '--minimal-main-dex'
         additionalParameters += '--set-max-idx-number=20000'
     }
+
+
+    applicationVariants.all { variant ->
+        if (variant.name == "release") {
+            variant.outputs.each { output ->
+                def file = output.outputFile
+                output.outputFile = new File(file.parent,
+                        "plugin1.apk")
+
+                copy {
+                    from output.outputFile.getCanonicalPath()
+                    into "../HostApp/src/main/assets"
+                }
+            }
+        }
+
+    }
 }
+
 
 task collectMainDexList {
     println sourceSets.asList()
