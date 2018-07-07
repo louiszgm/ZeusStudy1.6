@@ -23,13 +23,23 @@ android {
 
     applicationVariants.all { variant ->
         if (variant.name == "release") {
+            // checking for mapping file and copy to HostApp folder
+            if (variant.mappingFile != null && variant.mappingFile.exists()) {
+                def pluginMappingName = "mapping-$project.name" + ".txt"
+                copy {
+                    from variant.mappingFile.absolutePath
+                    into "../HostApp"
+                    rename 'mapping.txt', pluginMappingName
+                }
+//                new File("../HostApp/$pluginMappingName").append("\n-applymapping $pluginMappingName")
+            }
+            // rename release apk name and copy to HostApp's assets
             variant.outputs.each { output ->
                 def file = output.outputFile
                 output.outputFile = new File(file.parent,
                         "plugin1.apk")
-
                 copy {
-                    from output.outputFile.getCanonicalPath()
+                    from output.outputFile.absolutePath
                     into "../HostApp/src/main/assets"
                 }
             }
@@ -42,27 +52,50 @@ android {
 task collectMainDexList {
     println sourceSets.asList()
     sourceSets.iterator().each {
-        wEachClassWithInnerClassToFile('.','maindexlist','.txt',it.allJava.files,10)
+        wEachClassWithInnerClassToFile('.', 'maindexlist', '.txt', it.allJava.files, 10)
     }
 }
 
-def wEachClassWithInnerClassToFile(def directory, def fileName, def extension, def javaFiles, def innerClassCount) {
+task configProguard {
+    dontshrink(new File("./proguard-rules.pro"))
+    dontshrink(new File("../HostApp/proguard-rules.pro"))
+}
+
+def dontshrink(File proguardFile) {
+    boolean shouldAddConfig = true
+    if (proguardFile.exists()) {
+        proguardFile.eachLine {
+            if (it.trim() == "-dontshrink") {
+                println "contain dontshrink "
+                shouldAddConfig = false
+            }
+        }
+
+        if (shouldAddConfig) {
+            proguardFile << "\n-dontshrink"
+        }
+    }
+
+}
+
+def wEachClassWithInnerClassToFile(
+        def directory, def fileName, def extension, def javaFiles, def innerClassCount) {
     new File("$directory/$fileName$extension").withWriter { out ->
         javaFiles.iterator().each {
             String fullpath = it.canonicalPath
             // "java"字符串的长度 + 后面一个path字符的长度 = 5
             int packageStartIndex = fullpath.indexOf('java') + 5
-            String reference = fullpath.substring(packageStartIndex).replace("java","class")
+            String reference = fullpath.substring(packageStartIndex).replace("java", "class")
             println "Class in $name: $reference"
             out.println reference
             //write inner class placeholder
-            for (int i = 1; i < innerClassCount+1; i++) {
-                String innerClass = reference.replace('.',"\$$i.")
+            for (int i = 1; i < innerClassCount + 1; i++) {
+                String innerClass = reference.replace('.', "\$$i.")
                 out.println innerClass
             }
         }
     }
 }
-
+configProguard.dependsOn(preBuild)
 collectMainDexList.dependsOn(preBuild)
 
