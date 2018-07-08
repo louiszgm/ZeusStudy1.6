@@ -66,5 +66,8 @@ collectMaindexlist.depensOn(preBuild)
 
 # 拷贝Plugin1工程的mapping.txt到HostApp根目录 #
 
+
 # 配置Plugin1工程和HostApp工程的proguard-rules.pro文件 #
 
+# 注意事项 #
+  * 在运行 **HostApp** 工程之前， 需要先执行 **Plugin1** 工程的 **Assemble** 任务。主要是把 **Plugin1** 工程的apk拷贝到 **HostApp** 里面去，并且将生成的 **mapping.txt** 拷贝到 **HostApp** 的根目录并且命名为 **mapping_Plugin1.txt**
