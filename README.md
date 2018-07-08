@@ -30,7 +30,9 @@ sourceSets {
 
 # 自动生成Plugin1的maindexlist.txt  #
 在 **prebuild** 的任务之前，执行我们的任务 **collect
-ainDexList*
+MainDexList**
+
+**collectMaindexlist** 任务主要是用来扫描 **Plugin1** 的源码，并且生成对应的 ***.class** 以及对应的内部类。
 
 ``` groovy
 task collectMainDexList {
