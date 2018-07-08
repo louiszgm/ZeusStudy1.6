@@ -1,5 +1,9 @@
 该示例对应的是书中的19.3节。
 
+对应着混淆方案2的各个步骤：
+  * 配置multidex，并且生成maindexlist.txt
+  * 配置proguard
+
 # 准备工作 #
 
 ## 配置dexOptions ##
@@ -66,8 +70,52 @@ collectMaindexlist.depensOn(preBuild)
 
 # 拷贝Plugin1工程的mapping.txt到HostApp根目录 #
 
+这里只针对 **release** 的buildTypes 进行mapping文件的拷贝，因为我们只在该 **buildTYpes** 上配置了混淆
+``` groovy
+def pluginMappingName = "mapping_$project.name" + ".txt"
+
+applicationVariants.all { variant ->
+        if (variant.name == "release") {
+            // checking for mapping file and copy to HostApp folder
+            if (variant.mappingFile != null && variant.mappingFile.exists()) {
+                copy {
+                    from variant.mappingFile.absolutePath
+                    into "../HostApp"
+                    rename 'mapping.txt', pluginMappingName
+                }
+            }
+        }
+
+    }
+```
 
 # 配置Plugin1工程和HostApp工程的proguard-rules.pro文件 #
+**proguard-rules.pro** 文件需要加入 **-dontshrink** 配置
+
+``` groovy
+task configProguard {
+    dontshrink(new File("./proguard-rules.pro"))
+    dontshrink(new File("../HostApp/proguard-rules.pro"))
+}
+
+def dontshrink(File proguardFile) {
+    boolean shouldAddConfig = true
+    if (proguardFile.exists()) {
+        proguardFile.eachLine {
+            if (it.trim() == "-dontshrink") {
+                println "contain dontshrink "
+                shouldAddConfig = false
+            }
+        }
+
+        if (shouldAddConfig) {
+            proguardFile << "\n-dontshrink"
+        }
+    }
+
+}
+configProguard.dependsOn(preBuild)
+```
 
 # 注意事项 #
   * 在运行 **HostApp** 工程之前， 需要先执行 **Plugin1** 工程的 **Assemble** 任务。主要是把 **Plugin1** 工程的apk拷贝到 **HostApp** 里面去，并且将生成的 **mapping.txt** 拷贝到 **HostApp** 的根目录并且命名为 **mapping_Plugin1.txt**
