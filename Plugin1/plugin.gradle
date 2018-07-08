@@ -109,7 +109,6 @@ def generatePluginLibraryMappingFile(File pluginMappingFile, String packageName)
             }
         }
     }
-
 }
 
 preBuild.doFirst{

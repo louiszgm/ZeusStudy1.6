@@ -101,5 +101,4 @@
 
 
 
--applymapping mapping_common.txt
 -applymapping mapping_pluginlibrary.txt

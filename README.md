@@ -3,8 +3,19 @@
 对应着混淆方案2的各个步骤：
   * 配置multidex，并且生成maindexlist.txt
   * 配置proguard
+  * 提取Plugin1工程中mapping.txt中mypluginlibrary的部分，并在HostApp中的proguard文件apply
 
 # 准备工作 #
+
+## 如何使用该插件 ##
+  * 将 **plugin.gradle** 放置插件工程根目录
+  * 在插件工程中的 **build.gradle** 文件中引入
+
+  ``` groovy
+  apply from: 'plugin.gradle'
+  ```
+
+
 ## 配置dexOptions ##
 
 ``` groovy
@@ -45,24 +56,13 @@ preBuild.doFirst{
 }
 ```
 
-## 在Plugin1 assemble 之后，需要把Plugin1的apk拷贝至HostApp的assets目录，以及拷贝mappin.txt ##
+## 在Plugin1 assemble 之后，需要把Plugin1的apk拷贝至HostApp的assets目录，以及把mapping.txt中mupluginlibrary的部分提取出来放到HostApp根目录中 ##
 在这个步骤，直接用的是android插件中提供的属性 **applicationVariants.all**. 因此，在Plugin1 第一次assemble之后，需要再执行一次。
 
 这了为了方便拿到各个variant的一些路径，就使用这个。
 ``` groovy
 applicationVariants.all { variant ->
-        // checking for mapping file and copy to HostApp folder
-        if (variant.mappingFile != null && variant.mappingFile.exists()) {
-            copy {
-                from variant.mappingFile.absolutePath
-                into "../HostApp"
-                rename 'mapping.txt', pluginMappingName
-            }
-            setProguardFileWithConfig(new File("../HostApp/proguard-rules.pro"),"-applymapping $pluginMappingName")
-        }
-
         if (variant.name == "release") {
-
             // rename release apk name and copy to HostApp's assets
             variant.outputs.each { output ->
                 def file = output.outputFile
@@ -72,6 +72,12 @@ applicationVariants.all { variant ->
                     from output.outputFile.absolutePath
                     into "../HostApp/src/main/assets"
                 }
+            }
+
+            // generate mapping_pluginlibrary.txt to HostApp folder & config HostApp's Proguard File
+            if (variant.mappingFile != null && variant.mappingFile.exists()) {
+                generatePluginLibraryMappingFile(variant.mappingFile,"com.example.jianqiang.mypluginlibrary")
+                setProguardFileWithConfig(new File("../HostApp/proguard-rules.pro"),"-applymapping mapping_pluginlibrary.txt")
             }
         }
 
@@ -111,25 +117,29 @@ def wEachClassWithInnerClassToFile(
 }
 ```
 
-# 拷贝Plugin1工程的mapping.txt到HostApp根目录 #
+# 将Plugin1工程的mapping.txt中mupluginlibrary的部分提取出来放到HostApp根目录中 #
 
-这里只针对 **release** 的buildTypes 进行mapping文件的拷贝，因为我们只在该 **buildTypes** 上配置了混淆
+这里只针对 **release** 的buildTypes 进行mapping文件进行了处理，因为我们只在该 **buildTypes** 上配置了混淆
 ``` groovy
-def pluginMappingName = "mapping_$project.name" + ".txt"
-
-applicationVariants.all { variant ->
-        if (variant.name == "release") {
-            // checking for mapping file and copy to HostApp folder
-            if (variant.mappingFile != null && variant.mappingFile.exists()) {
-                copy {
-                    from variant.mappingFile.absolutePath
-                    into "../HostApp"
-                    rename 'mapping.txt', pluginMappingName
+def generatePluginLibraryMappingFile(File pluginMappingFile, String packageName){
+    def pluginLibMappingFile = file("../HostApp/mapping_pluginlibrary.txt")
+    boolean isPluginLibrary
+    pluginLibMappingFile.withWriter { out ->
+        pluginMappingFile.eachLine {
+            if (it.startsWith(' ')){
+                if (isPluginLibrary){
+                    out.println it
+                }
+            }else {
+                isPluginLibrary = false
+                if (it.startsWith(packageName)){
+                    isPluginLibrary = true
+                    out.println it
                 }
             }
         }
-
     }
+}
 ```
 
 # 配置Plugin1工程和HostApp工程的proguard-rules.pro文件 #
@@ -159,4 +169,4 @@ def setProguardFileWithConfig(File proguardFile, String config) {
 ```
 
 # 注意事项 #
-  * 在运行 **HostApp** 工程之前， 需要先执行 **Plugin1** 工程的 **Assemble** 任务。主要是把 **Plugin1** 工程的apk拷贝到 **HostApp** 里面去，并且将生成的 **mapping.txt** 拷贝到 **HostApp** 的根目录并且命名为 **mapping_Plugin1.txt**
+  * 在运行 **HostApp** 工程之前， 需要先执行 **Plugin1** 工程的 **Assemble** 任务。主要是把 **Plugin1** 工程的apk拷贝到 **HostApp** 中的assets文件夹并且将生成的 **mapping.txt** 中提取 **mypluginlibrary** 的部分到 **HostApp** 的根目录并且命名为 **mapping_pluginlibrary.txt**
