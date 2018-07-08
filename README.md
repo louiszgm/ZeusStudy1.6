@@ -1,9 +1,5 @@
 该示例对应的是书中的19.3节。
 
-[配置dexOptions][]
-
-[配置dexOptions]: link to header
-
 # 准备工作 #
 
 ## 配置dexOptions ##
@@ -33,6 +29,38 @@ sourceSets {
 ```
 
 # 自动生成Plugin1的maindexlist.txt  #
+在 **prebuild** 的任务之前，执行我们的任务 **collect
+ainDexList*
+
+``` groovy
+task collectMainDexList {
+    println sourceSets.asList()
+    sourceSets.iterator().each {
+        wEachClassWithInnerClassToFile('.', 'maindexlist', '.txt', it.allJava.files, 10)
+    }
+}
+
+def wEachClassWithInnerClassToFile(
+        def directory, def fileName, def extension, def javaFiles, def innerClassCount) {
+    new File("$directory/$fileName$extension").withWriter { out ->
+        javaFiles.iterator().each {
+            String fullpath = it.canonicalPath
+            // "java"字符串的长度 + 后面一个path字符的长度 = 5
+            int packageStartIndex = fullpath.indexOf('java') + 5
+            String reference = fullpath.substring(packageStartIndex).replace("java", "class")
+            println "Class in $name: $reference"
+            out.println reference
+            //write inner class placeholder
+            for (int i = 1; i < innerClassCount + 1; i++) {
+                String innerClass = reference.replace('.', "\$$i.")
+                out.println innerClass
+            }
+        }
+    }
+}
+
+collectMaindexlist.depensOn(preBuild)
+```
 
 # 拷贝Plugin1工程的mapping.txt到HostApp根目录 #
 
