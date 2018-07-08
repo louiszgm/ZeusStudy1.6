@@ -22,15 +22,19 @@ android {
 
 
     applicationVariants.all { variant ->
-        if (variant.name == "release") {
-            // checking for mapping file and copy to HostApp folder
-            if (variant.mappingFile != null && variant.mappingFile.exists()) {
-                copy {
-                    from variant.mappingFile.absolutePath
-                    into "../HostApp"
-                    rename 'mapping.txt', pluginMappingName
-                }
+        println "==================================applicationVariants"
+        // checking for mapping file and copy to HostApp folder
+        if (variant.mappingFile != null && variant.mappingFile.exists()) {
+            copy {
+                from variant.mappingFile.absolutePath
+                into "../HostApp"
+                rename 'mapping.txt', pluginMappingName
             }
+            setProguardFileWithConfig(new File("../HostApp/proguard-rules.pro"),"-applymapping $pluginMappingName")
+        }
+
+        if (variant.name == "release") {
+
             // rename release apk name and copy to HostApp's assets
             variant.outputs.each { output ->
                 def file = output.outputFile
@@ -44,7 +48,10 @@ android {
         }
 
     }
+
 }
+
+
 
 
 task collectMainDexList {
@@ -54,23 +61,26 @@ task collectMainDexList {
     }
 }
 
-task configProguard {
-    dontshrink(new File("./proguard-rules.pro"))
-    dontshrink(new File("../HostApp/proguard-rules.pro"))
+task configProguardDontShrink {
+    setProguardFileWithConfig(new File("./proguard-rules.pro"),"-dontshrink")
+    setProguardFileWithConfig(new File("../HostApp/proguard-rules.pro"),"-dontshrink")
 }
 
-def dontshrink(File proguardFile) {
+task configHostApp {
+
+
+}
+def setProguardFileWithConfig(File proguardFile, String config) {
     boolean shouldAddConfig = true
     if (proguardFile.exists()) {
         proguardFile.eachLine {
-            if (it.trim() == "-dontshrink") {
-                println "contain dontshrink "
+            if (it.trim() == "$config") {
                 shouldAddConfig = false
             }
         }
 
         if (shouldAddConfig) {
-            proguardFile << "\n-dontshrink"
+            proguardFile << "\n$config"
         }
     }
 
@@ -94,8 +104,7 @@ def wEachClassWithInnerClassToFile(
         }
     }
 }
-configProguard.dependsOn(preBuild)
-collectMainDexList.dependsOn(preBuild)
-build.doLast{
-    file("../HostApp/proguard-rules.pro") << "\n-applymapping $pluginMappingName"
-}
+
+
+
+

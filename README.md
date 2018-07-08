@@ -5,7 +5,6 @@
   * 配置proguard
 
 # 准备工作 #
-
 ## 配置dexOptions ##
 
 ``` groovy
@@ -32,9 +31,24 @@ sourceSets {
 }
 ```
 
+# 各任务hook的时机 #
+主要是自定义了如下几个任务
+  * collectMaindexlist
+  * configProguardDontShrink
+  
+## 在Plugin1 **prebuild** 之前，需要生成 **maindexlist.txt** 和 配置proguard文件的 **-dontshrink** ##
+
+``` groovy
+preBuild.doFirst{
+    collectMainDexList.execute()
+    configProguardDontShrink.execute()
+}
+```
+
+## 在Plugin1 assenble 之后，需要把Plugin1的apk拷贝至HostApp的assets目录，以及拷贝mappin.txt ##
+
 # 自动生成Plugin1的maindexlist.txt  #
-在 **prebuild** 的任务之前，执行我们的任务 **collect
-MainDexList**
+在 **prebuild** 的任务之前，执行我们的任务 **collectMainDexList**
 
 **collectMaindexlist** 任务主要是用来扫描 **Plugin1** 的源码，并且生成对应的 ***.class** 以及对应的内部类。
 
@@ -64,13 +78,11 @@ def wEachClassWithInnerClassToFile(
         }
     }
 }
-
-collectMaindexlist.depensOn(preBuild)
 ```
 
 # 拷贝Plugin1工程的mapping.txt到HostApp根目录 #
 
-这里只针对 **release** 的buildTypes 进行mapping文件的拷贝，因为我们只在该 **buildTYpes** 上配置了混淆
+这里只针对 **release** 的buildTypes 进行mapping文件的拷贝，因为我们只在该 **buildTypes** 上配置了混淆
 ``` groovy
 def pluginMappingName = "mapping_$project.name" + ".txt"
 
@@ -93,28 +105,26 @@ applicationVariants.all { variant ->
 **proguard-rules.pro** 文件需要加入 **-dontshrink** 配置
 
 ``` groovy
-task configProguard {
-    dontshrink(new File("./proguard-rules.pro"))
-    dontshrink(new File("../HostApp/proguard-rules.pro"))
+task configProguardDontShrink {
+    setProguardFileWithConfig(new File("./proguard-rules.pro"),"-dontshrink")
+    setProguardFileWithConfig(new File("../HostApp/proguard-rules.pro"),"-dontshrink")
 }
 
-def dontshrink(File proguardFile) {
+def setProguardFileWithConfig(File proguardFile, String config) {
     boolean shouldAddConfig = true
     if (proguardFile.exists()) {
         proguardFile.eachLine {
-            if (it.trim() == "-dontshrink") {
-                println "contain dontshrink "
+            if (it.trim() == "$config") {
                 shouldAddConfig = false
             }
         }
 
         if (shouldAddConfig) {
-            proguardFile << "\n-dontshrink"
+            proguardFile << "\n$config"
         }
     }
 
 }
-configProguard.dependsOn(preBuild)
 ```
 
 # 注意事项 #

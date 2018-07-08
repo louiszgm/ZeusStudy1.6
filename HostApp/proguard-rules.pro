@@ -99,4 +99,6 @@
 -keep class com.handmark.pulltorefresh.library.** { *; }
 -dontwarn com.handmark.pulltorefresh.library.**
 
+
+
 -applymapping mapping_Plugin1.txt
