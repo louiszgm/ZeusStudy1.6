@@ -45,7 +45,38 @@ preBuild.doFirst{
 }
 ```
 
-## 在Plugin1 assenble 之后，需要把Plugin1的apk拷贝至HostApp的assets目录，以及拷贝mappin.txt ##
+## 在Plugin1 assemble 之后，需要把Plugin1的apk拷贝至HostApp的assets目录，以及拷贝mappin.txt ##
+在这个步骤，直接用的是android插件中提供的属性 **applicationVariants.all**. 因此，在Plugin1 第一次assemble之后，需要再执行一次。
+
+这了为了方便拿到各个variant的一些路径，就使用这个。
+``` groovy
+applicationVariants.all { variant ->
+        // checking for mapping file and copy to HostApp folder
+        if (variant.mappingFile != null && variant.mappingFile.exists()) {
+            copy {
+                from variant.mappingFile.absolutePath
+                into "../HostApp"
+                rename 'mapping.txt', pluginMappingName
+            }
+            setProguardFileWithConfig(new File("../HostApp/proguard-rules.pro"),"-applymapping $pluginMappingName")
+        }
+
+        if (variant.name == "release") {
+
+            // rename release apk name and copy to HostApp's assets
+            variant.outputs.each { output ->
+                def file = output.outputFile
+                output.outputFile = new File(file.parent,
+                        "plugin1.apk")
+                copy {
+                    from output.outputFile.absolutePath
+                    into "../HostApp/src/main/assets"
+                }
+            }
+        }
+
+    }
+```
 
 # 自动生成Plugin1的maindexlist.txt  #
 在 **prebuild** 的任务之前，执行我们的任务 **collectMainDexList**
