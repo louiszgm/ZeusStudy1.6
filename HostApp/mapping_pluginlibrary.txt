@@ -1,0 +1,89 @@
+com.example.jianqiang.mypluginlibrary.AppConstants -> com.example.jianqiang.mypluginlibrary.a:
+    java.lang.String PROXY_VIEW_ACTION -> a
+    java.lang.String EXTRA_DEX_PATH -> b
+    java.lang.String EXTRA_CLASS -> c
+    6:6:void <init>() -> <init>
+com.example.jianqiang.mypluginlibrary.BuildConfig -> com.example.jianqiang.mypluginlibrary.b:
+    boolean DEBUG -> a
+    java.lang.String APPLICATION_ID -> b
+    java.lang.String BUILD_TYPE -> c
+    java.lang.String FLAVOR -> d
+    int VERSION_CODE -> e
+    java.lang.String VERSION_NAME -> f
+    6:6:void <init>() -> <init>
+com.example.jianqiang.mypluginlibrary.DLUtils -> com.example.jianqiang.mypluginlibrary.c:
+    10:10:void <init>() -> <init>
+    13:22:android.content.pm.PackageInfo getPackageInfo(android.content.Context,java.lang.String) -> a
+    26:39:android.graphics.drawable.Drawable getAppIcon(android.content.Context,java.lang.String) -> b
+    43:56:java.lang.CharSequence getAppLabel(android.content.Context,java.lang.String) -> c
+com.example.jianqiang.mypluginlibrary.PluginConstant -> com.example.jianqiang.mypluginlibrary.d:
+    java.lang.String PLUGINWEB_MAINIFEST_FILE -> a
+    java.lang.String PLUGIN_SUFF -> b
+    java.lang.String PLUGIN_REAL_ACTIVITY -> c
+    java.lang.String PLUGIN_ACTIVITY_FOR_STANDARD -> d
+    java.lang.String PLUGIN_JAR_SUFF -> e
+    java.lang.String PLUGIN_INSTALLED_INFO_PATH -> f
+    java.lang.String EXP_PLUG_PREFIX -> g
+    java.lang.String EXP_PLUG_HOT_FIX_PREFIX -> h
+    7:7:void <init>() -> <init>
+com.example.jianqiang.mypluginlibrary.PluginItem -> com.example.jianqiang.mypluginlibrary.e:
+    android.content.pm.PackageInfo packageInfo -> a
+    java.lang.String pluginPath -> b
+    9:10:void <init>() -> <init>
+com.example.jianqiang.mypluginlibrary.PluginManager -> com.example.jianqiang.mypluginlibrary.f:
+    java.util.List plugins -> a
+    android.content.res.Resources mNowResources -> b
+    android.content.Context mBaseContext -> c
+    java.lang.Object mPackageInfo -> f
+    java.lang.ClassLoader mNowClassLoader -> d
+    java.lang.ClassLoader mBaseClassLoader -> e
+    15:15:void <init>() -> <init>
+    32:77:void init(android.app.Application) -> a
+    80:85:com.example.jianqiang.mypluginlibrary.PluginItem generatePluginItem(java.lang.String) -> a
+    90:118:void reloadInstalledPluginResources(java.util.ArrayList) -> a
+    16:28:void <clinit>() -> <clinit>
+com.example.jianqiang.mypluginlibrary.R -> com.example.jianqiang.mypluginlibrary.g:
+    9:9:void <init>() -> <init>
+com.example.jianqiang.mypluginlibrary.RefInvoke -> com.example.jianqiang.mypluginlibrary.h:
+    8:8:void <init>() -> <init>
+    12:22:java.lang.Object createObject(java.lang.String) -> a
+    27:30:java.lang.Object createObject(java.lang.Class) -> a
+    35:45:java.lang.Object createObject(java.lang.String,java.lang.Class,java.lang.Object) -> a
+    50:53:java.lang.Object createObject(java.lang.Class,java.lang.Class,java.lang.Object) -> a
+    59:65:java.lang.Object createObject(java.lang.String,java.lang.Class[],java.lang.Object[]) -> a
+    71:78:java.lang.Object createObject(java.lang.Class,java.lang.Class[],java.lang.Object[]) -> a
+    85:98:java.lang.Object invokeInstanceMethod(java.lang.Object,java.lang.String,java.lang.Class[],java.lang.Object[]) -> a
+    103:106:java.lang.Object invokeInstanceMethod(java.lang.Object,java.lang.String,java.lang.Class,java.lang.Object) -> a
+    111:114:java.lang.Object invokeInstanceMethod(java.lang.Object,java.lang.String) -> a
+    122:125:java.lang.Object invokeStaticMethod(java.lang.String,java.lang.String) -> a
+    130:133:java.lang.Object invokeStaticMethod(java.lang.String,java.lang.String,java.lang.Class,java.lang.Object) -> a
+    139:145:java.lang.Object invokeStaticMethod(java.lang.String,java.lang.String,java.lang.Class[],java.lang.Object[]) -> a
+    150:153:java.lang.Object invokeStaticMethod(java.lang.Class,java.lang.String) -> a
+    158:161:java.lang.Object invokeStaticMethod(java.lang.Class,java.lang.String,java.lang.Class,java.lang.Object) -> a
+    167:174:java.lang.Object invokeStaticMethod(java.lang.Class,java.lang.String,java.lang.Class[],java.lang.Object[]) -> a
+    181:181:java.lang.Object getFieldObject(java.lang.Object,java.lang.String) -> b
+    186:191:java.lang.Object getFieldObject(java.lang.String,java.lang.Object,java.lang.String) -> a
+    196:203:java.lang.Object getFieldObject(java.lang.Class,java.lang.Object,java.lang.String) -> a
+    208:209:void setFieldObject(java.lang.Object,java.lang.String,java.lang.Object) -> a
+    213:219:void setFieldObject(java.lang.Class,java.lang.Object,java.lang.String,java.lang.Object) -> a
+    223:228:void setFieldObject(java.lang.String,java.lang.Object,java.lang.String,java.lang.Object) -> a
+    234:234:java.lang.Object getStaticFieldObject(java.lang.String,java.lang.String) -> b
+    238:238:java.lang.Object getStaticFieldObject(java.lang.Class,java.lang.String) -> b
+    242:243:void setStaticFieldObject(java.lang.String,java.lang.String,java.lang.Object) -> a
+    246:247:void setStaticFieldObject(java.lang.Class,java.lang.String,java.lang.Object) -> a
+com.example.jianqiang.mypluginlibrary.UserInfo -> com.example.jianqiang.mypluginlibrary.UserInfo:
+    java.lang.String userName -> a
+    int score -> b
+    12:15:void <init>(java.lang.String,int) -> <init>
+com.example.jianqiang.mypluginlibrary.Utils -> com.example.jianqiang.mypluginlibrary.i:
+    16:16:void <init>() -> <init>
+    25:45:void extractAssets(android.content.Context,java.lang.String) -> a
+    49:57:void closeSilently(java.io.Closeable) -> a
+com.example.jianqiang.mypluginlibrary.ZeusBaseActivity -> com.example.jianqiang.mypluginlibrary.ZeusBaseActivity:
+    11:11:void <init>() -> <init>
+    15:15:android.content.res.Resources getResources() -> getResources
+com.example.jianqiang.mypluginlibrary.ZeusClassLoader -> com.example.jianqiang.mypluginlibrary.j:
+    java.util.List mClassLoaderList -> a
+    20:26:void <init>(java.lang.String,java.lang.ClassLoader) -> <init>
+    32:33:void addPluginClassLoader(dalvik.system.DexClassLoader) -> a
+    37:64:java.lang.Class loadClass(java.lang.String,boolean) -> loadClass

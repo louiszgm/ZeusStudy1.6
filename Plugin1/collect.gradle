@@ -1,63 +1,30 @@
 group = "Plugin1"
 version = "1.0"
-def pluginMappingName = "mapping_$project.name" + ".txt"
-sourceSets {
-    main {
-        java {
-            srcDir 'src/main/java'
-        }
-    }
-}
-
-android {
-    dexOptions {
-        javaMaxHeapSize "4g"
-        preDexLibraries = false
-
-        additionalParameters += '--multi-dex'
-        additionalParameters += '--main-dex-list=maindexlist.txt'
-        additionalParameters += '--minimal-main-dex'
-        additionalParameters += '--set-max-idx-number=20000'
-    }
-
-
-    applicationVariants.all { variant ->
-        println "==================================applicationVariants"
-        // checking for mapping file and copy to HostApp folder
-        if (variant.mappingFile != null && variant.mappingFile.exists()) {
-            copy {
-                from variant.mappingFile.absolutePath
-                into "../HostApp"
-                rename 'mapping.txt', pluginMappingName
-            }
-            setProguardFileWithConfig(new File("../HostApp/proguard-rules.pro"),"-applymapping $pluginMappingName")
-        }
-
-        if (variant.name == "release") {
-
-            // rename release apk name and copy to HostApp's assets
-            variant.outputs.each { output ->
-                def file = output.outputFile
-                output.outputFile = new File(file.parent,
-                        "plugin1.apk")
-                copy {
-                    from output.outputFile.absolutePath
-                    into "../HostApp/src/main/assets"
-                }
-            }
-        }
-
-    }
-
-}
-
-
-
+def pluginLibraryMappingName = ""
 
 task collectMainDexList {
     println sourceSets.asList()
     sourceSets.iterator().each {
         wEachClassWithInnerClassToFile('.', 'maindexlist', '.txt', it.allJava.files, 10)
+    }
+}
+
+def wEachClassWithInnerClassToFile(
+        def directory, def fileName, def extension, def javaFiles, def innerClassCount) {
+    new File("$directory/$fileName$extension").withWriter { out ->
+        javaFiles.iterator().each {
+            String fullpath = it.canonicalPath
+            // "java"字符串的长度 + 后面一个path字符的长度 = 5
+            int packageStartIndex = fullpath.indexOf('java') + 5
+            String reference = fullpath.substring(packageStartIndex).replace("java", "class")
+            println "Class in $name: $reference"
+            out.println reference
+            //write inner class placeholder
+            for (int i = 1; i < innerClassCount + 1; i++) {
+                String innerClass = reference.replace('.', "\$$i.")
+                out.println innerClass
+            }
+        }
     }
 }
 
@@ -82,23 +49,72 @@ def setProguardFileWithConfig(File proguardFile, String config) {
 
 }
 
-def wEachClassWithInnerClassToFile(
-        def directory, def fileName, def extension, def javaFiles, def innerClassCount) {
-    new File("$directory/$fileName$extension").withWriter { out ->
-        javaFiles.iterator().each {
-            String fullpath = it.canonicalPath
-            // "java"字符串的长度 + 后面一个path字符的长度 = 5
-            int packageStartIndex = fullpath.indexOf('java') + 5
-            String reference = fullpath.substring(packageStartIndex).replace("java", "class")
-            println "Class in $name: $reference"
-            out.println reference
-            //write inner class placeholder
-            for (int i = 1; i < innerClassCount + 1; i++) {
-                String innerClass = reference.replace('.', "\$$i.")
-                out.println innerClass
+sourceSets {
+    main {
+        java {
+            srcDir 'src/main/java'
+        }
+    }
+}
+
+android {
+    dexOptions {
+        javaMaxHeapSize "4g"
+        preDexLibraries = false
+
+        additionalParameters += '--multi-dex'
+        additionalParameters += '--main-dex-list=maindexlist.txt'
+        additionalParameters += '--minimal-main-dex'
+        additionalParameters += '--set-max-idx-number=20000'
+    }
+
+
+    applicationVariants.all { variant ->
+        println "==================================applicationVariants"
+
+        if (variant.name == "release") {
+            // rename release apk name and copy to HostApp's assets
+            variant.outputs.each { output ->
+                def file = output.outputFile
+                output.outputFile = new File(file.parent,
+                        "plugin1.apk")
+                copy {
+                    from output.outputFile.absolutePath
+                    into "../HostApp/src/main/assets"
+                }
+            }
+
+            // generate mapping_pluginlibrary.txt to HostApp folder & config HostApp's Proguard File
+            if (variant.mappingFile != null && variant.mappingFile.exists()) {
+                generatePluginLibraryMappingFile(variant.mappingFile,"com.example.jianqiang.mypluginlibrary")
+                setProguardFileWithConfig(new File("../HostApp/proguard-rules.pro"),"-applymapping mapping_pluginlibrary.txt")
+            }
+        }
+
+    }
+
+}
+
+
+def generatePluginLibraryMappingFile(File pluginMappingFile, String packageName){
+    def pluginLibMappingFile = file("../HostApp/mapping_pluginlibrary.txt")
+    boolean isPluginLibrary
+    pluginLibMappingFile.withWriter { out ->
+        pluginMappingFile.eachLine {
+            if (it.startsWith(' ')){
+                if (isPluginLibrary){
+                    out.println it
+                }
+            }else {
+                isPluginLibrary = false
+                if (it.startsWith(packageName)){
+                    isPluginLibrary = true
+                    out.println it
+                }
             }
         }
     }
+
 }
 
 preBuild.doFirst{
