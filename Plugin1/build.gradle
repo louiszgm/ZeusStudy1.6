@@ -54,4 +54,4 @@ dependencies {
     compile project(path: ':mypluginlibrary')
 }
 
-apply from: 'collect.gradle'
+apply from: 'plugin.gradle'

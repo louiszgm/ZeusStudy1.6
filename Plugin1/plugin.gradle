@@ -1,6 +1,3 @@
-group = "Plugin1"
-version = "1.0"
-def pluginLibraryMappingName = ""
 
 task collectMainDexList {
     println sourceSets.asList()
@@ -70,8 +67,6 @@ android {
 
 
     applicationVariants.all { variant ->
-        println "==================================applicationVariants"
-
         if (variant.name == "release") {
             // rename release apk name and copy to HostApp's assets
             variant.outputs.each { output ->
