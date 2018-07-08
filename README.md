@@ -1,5 +1,9 @@
 该示例对应的是书中的19.3节。
 
+[配置dexOptions][]
+
+[配置dexOptions]: link to header
+
 # 准备工作 #
 
 ## 配置dexOptions ##
@@ -17,6 +21,16 @@
 ```
 
 ## 配置工程的sourceSets ##
+
+``` groovy
+sourceSets {
+    main {
+        java {
+            srcDir 'src/main/java'
+        }
+    }
+}
+```
 
 # 自动生成Plugin1的maindexlist.txt  #
 
